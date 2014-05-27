@@ -5,30 +5,44 @@ import re
 
 from config import filenames, destdirpath
 
-RE_NORMAL1 = re.compile(r"^.*?Holidays(.*?)[^0-9\s].*?Holidays(.*?)Last.*$")
-RE_NORMAL2 = re.compile(r"^.*?Holidays(.*?)Last.*?(?:Holidays(.*?)For.*)?$")
+
+# 文字列の中から時刻表の部分だけを抜き出すregex
+RE_P1 = re.compile(r"^.*?Holidays(.*?)[^0-9\s].*?Holidays(.*?)Last.*$")
+RE_P2 = re.compile(r"^.*?Holidays(.*?)Last.*?(?:Holidays(.*?)For.*)?$")
+
+
+class NotMatchException(Exception): pass
+
+class NotFoundStationException(Exception): pass
+
 
 def get_text(path):
     with open(path) as f:
         return ''.join(f.readlines())
 
 def get_text_per_direction(text):
-    m = RE_NORMAL1.search(text)
+    """正規表現で時刻表っぽいところを抽出する
+    戻り値はリストで[0]には福住方面行きの時刻表
+    [1]には栄町方面行きの時刻表を格納する。
+    """
+    m = RE_P1.search(text)
     if m:
         return list(m.groups())
 
-    m = RE_NORMAL2.search(text)
+    m = RE_P2.search(text)
     if m:
         dirs = list(m.groups())
         if dirs[1] is None:
             dirs.pop(1)
             if 'For Fukuzumi' in text:
                 dirs.append(None)
-            else:
+            elif 'For Sakaemachi' in text:
                 dirs.insert(0, None)
+            else:
+                raise NotFoundStationException()
         return dirs
 
-    raise Exception('(((?_?)))')
+    raise NotMatchException()
 
 
 def parse(text, filename):
@@ -64,6 +78,7 @@ def parse(text, filename):
         or 'toyohira' in filename or 'misono' in filename:
         hours = [6,7,8,8,9,10,11,12,13,14,15,15,16,17,18,19,19,20,21,22,23,0]
         #pdfの取得処理のせいだとは思うが、なぜか8,15,19,24が2回出現する・・・
+        #どうにかしたい。extractText周りのパラメータ調整を試してみる、とか。
     else:
         hours = list(range(6, 24)) + [0]
 
@@ -74,6 +89,12 @@ def parse(text, filename):
     return weekdays,holidays
 
 def main():
+    """
+    dias[0]には平日の時刻表
+    dias[1]には休日の時刻表
+    時刻表[0]に福住方面行きの時刻表
+    時刻表[1]には
+    """
     dias = {}
     for filename in filenames:
         dias[filename] = [None, None]
