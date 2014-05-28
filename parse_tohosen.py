@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 import re
+import json
 
 from config import filenames, destdirpath
 
@@ -90,24 +91,25 @@ def parse(text, filename):
 
 def main():
     """
-    dias[0]には平日の時刻表
-    dias[1]には休日の時刻表
+    dia[0]には平日の時刻表
+    dia[1]には休日の時刻表
     時刻表[0]に福住方面行きの時刻表
-    時刻表[1]には
+    時刻表[1]に栄町方面行きの時刻表
+    dia.jsonに保存する
     """
-    dias = {}
+    dia = {}
     for filename in filenames:
-        dias[filename] = [None, None]
+        dia[filename] = [None, None]
         path = os.path.join(destdirpath, filename + '.txt')
         text = get_text(path)
         dirs = get_text_per_direction(text)
         for i,v in enumerate(dirs):
             if v is None:
                 continue
-            dias[filename][i] = parse(v, filename)
-    print(dias['h26_01sakaemati_daiya.pdf'][0][0])
-    print(dias['h26_01sakaemati_daiya.pdf'][0][1])
-    print(dias['h26_01sakaemati_daiya.pdf'][1])
+            dia[filename][i] = parse(v, filename)
+
+    with open('dia.json', 'w') as f:
+        f.write(json.dumps(dia))
 
 
 if __name__ == '__main__':
