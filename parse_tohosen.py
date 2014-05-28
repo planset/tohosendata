@@ -4,7 +4,7 @@ import os
 import re
 import json
 
-from config import filenames, destdirpath
+from config import stations, destdirpath
 
 
 # 文字列の中から時刻表の部分だけを抜き出すregex
@@ -98,18 +98,22 @@ def main():
     dia.jsonに保存する
     """
     dia = {}
-    for filename in filenames:
-        dia[filename] = [None, None]
+    for station in stations:
+        filename = station[1]
+        station_id = station[0]
+        dia[station_id] = [None, None]
         path = os.path.join(destdirpath, filename + '.txt')
         text = get_text(path)
         dirs = get_text_per_direction(text)
         for i,v in enumerate(dirs):
             if v is None:
                 continue
-            dia[filename][i] = parse(v, filename)
+            dia[station_id][i] = parse(v, filename)
 
     with open('dia.json', 'w') as f:
         f.write(json.dumps(dia))
+    with open('station.json', 'w') as f:
+        f.write(json.dumps(stations))
 
 
 if __name__ == '__main__':

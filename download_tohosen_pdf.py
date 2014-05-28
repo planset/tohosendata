@@ -3,12 +3,13 @@
 import os
 import urllib.request
 
-from config import BASE_URL, filenames, srcdirpath
+from config import BASE_URL, stations, srcdirpath
 
 if not os.path.exists(srcdirpath):
     os.mkdir(srcdirpath)
 
-for filename in filenames:
+for station in stations:
+    filename = station[1]
     url = BASE_URL.format(filename=filename)
     srcfilepath = os.path.join(srcdirpath, filename)
     urllib.request.urlretrieve(url, srcfilepath)
