@@ -87,13 +87,13 @@ def parse(text, filename):
         i = _parse(weekdays, text, i, nh)
         i = _parse(holidays, text, i, nh)
 
-    return weekdays,holidays
+    return {'weekday':weekdays, 'holiday':holidays}
 
 def main():
     """
     dia[station_id]に該当する駅の時刻表
-    時刻表[0]には平日の時刻表
-    時刻表[1]には休日の時刻表
+    時刻表['weekday']には平日の時刻表
+    時刻表['holiday']には休日の時刻表
     平日の時刻表[0]に福住方面行きの時刻表
     平日の時刻表[1]に栄町方面行きの時刻表
     休日の時刻表[0]に福住方面行きの時刻表
@@ -104,14 +104,18 @@ def main():
     for station in stations:
         filename = station['pdf_file_name']
         station_id = station['station_id']
-        dia[station_id] = [None, None]
+        dia[station_id] = {
+            'fukuzumi':None,
+            'sakaemachi':None
+        }
         path = os.path.join(destdirpath, filename + '.txt')
         text = get_text(path)
         dirs = get_text_per_direction(text)
         for i,v in enumerate(dirs):
             if v is None:
                 continue
-            dia[station_id][i] = parse(v, filename)
+            direction_id = 'fukuzumi' if i == 0 else 'sakaemachi'
+            dia[station_id][direction_id] = parse(v, filename)
 
     with open('dia.json', 'w') as f:
         f.write(json.dumps(dia))
