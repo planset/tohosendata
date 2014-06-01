@@ -102,8 +102,8 @@ def main():
     """
     dia = {}
     for station in stations:
-        filename = station[1]
-        station_id = station[0]
+        filename = station['pdf_file_name']
+        station_id = station['station_id']
         dia[station_id] = [None, None]
         path = os.path.join(destdirpath, filename + '.txt')
         text = get_text(path)
@@ -115,8 +115,6 @@ def main():
 
     with open('dia.json', 'w') as f:
         f.write(json.dumps(dia))
-    with open('station.json', 'w') as f:
-        f.write(json.dumps(stations))
 
 
 if __name__ == '__main__':

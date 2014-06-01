@@ -9,7 +9,7 @@ if not os.path.exists(srcdirpath):
     os.mkdir(srcdirpath)
 
 for station in stations:
-    filename = station[1]
+    filename = station['pdf_file_name']
     url = BASE_URL.format(filename=filename)
     srcfilepath = os.path.join(srcdirpath, filename)
     urllib.request.urlretrieve(url, srcfilepath)
