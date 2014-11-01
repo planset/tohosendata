@@ -35,7 +35,7 @@ def convert_from_stdin_to_stdout():
 if __name__ == '__main__':
     import argparse
 
-    parser = argparse.ArgumentParser(description="calculate X to the power of Y")
+    parser = argparse.ArgumentParser(description="Convert from CSV to JSON.")
 
     parser.add_argument("srccsvpath", type=str, help="The source CSV file path.", default=None, nargs='?')
     parser.add_argument("savejsonpath", type=str, help="The destination JSON file path.", default=None, nargs='?')
